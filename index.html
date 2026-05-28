@@ -1011,23 +1011,89 @@
 
   <script>
     (function() {
+      // ══════════════════════════════════════════════════
+      //  Apps Script 트래킹 URL (배포 후 교체 필요)
+      // ══════════════════════════════════════════════════
+      const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbyKfcr1Z8YotiTvyD7H7sk32XligPtwzkeISAlYA6Q52JhwmS8mJcZRfaE0ae2UtKC1pw/exec';
+
+      // ─── URL 파라미터 파싱 ───
       const params = new URLSearchParams(window.location.search);
-      const storeName = params.get('store_name') || '카페 미정';
-      const nickname  = params.get('nickname')   || '닉네임';
-      const code      = params.get('code')       || '0000-0000';
+      const storeName    = params.get('store_name')    || '카페 미정';
+      const nickname     = params.get('nickname')      || '닉네임';
+      const code         = params.get('code')          || '0000-0000';
+      const customerName = params.get('customer_name') || '';
+      const from         = params.get('from')          || 'direct'; // qr / direct / crm
 
       const segment = (params.get('segment') || params.get('status') || 'unregistered').toLowerCase();
       const isUnregistered = (segment === 'unregistered' || segment === '미등록' || segment === 'new');
 
+      // ─── 세션/사용자 ID ───
+      const sessionId = 'S_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+      let userId = '';
+      try {
+        userId = localStorage.getItem('po_user_id');
+        if (!userId) {
+          userId = 'U_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+          localStorage.setItem('po_user_id', userId);
+        }
+      } catch (e) {
+        userId = 'U_temp_' + Math.random().toString(36).substr(2, 8);
+      }
+
+      // ─── 변수 주입 ───
       document.querySelectorAll('[data-store]').forEach(el => { el.textContent = storeName; });
       document.querySelectorAll('[data-nickname]').forEach(el => { el.textContent = nickname; });
       document.querySelectorAll('[data-code]').forEach(el => { el.textContent = code; });
 
+      // ─── 세그먼트 분기 표시 ───
       if (isUnregistered) {
         document.getElementById('full-flow').style.display = '';
         document.getElementById('faq-code-error').style.display = '';
       } else {
         document.getElementById('quick-flow').style.display = '';
+      }
+
+      // ─── 트래킹 함수 ───
+      function track(eventName, extra) {
+        if (!TRACKING_URL) return;
+        const payload = {
+          page: 'staff',
+          sessionId: sessionId,
+          userId: userId,
+          event: eventName,
+          storeName: storeName,
+          nickname: nickname,
+          code: code,
+          segment: segment,
+          customerName: customerName,
+          from: from,
+          referrer: document.referrer || '',
+          userAgent: navigator.userAgent || '',
+          timestamp: new Date().toISOString(),
+          extra: extra || {}
+        };
+        try {
+          const data = JSON.stringify(payload);
+          if (navigator.sendBeacon) {
+            const blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
+            if (navigator.sendBeacon(TRACKING_URL, blob)) return;
+          }
+          fetch(TRACKING_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: data,
+            keepalive: true
+          });
+        } catch (e) { /* silent */ }
+      }
+
+      // ─── 이벤트: 페이지 진입 ───
+      track('PAGE_VIEW');
+
+      // ─── 이벤트: QR로 진입한 경우 별도 식별 ───
+      if (from === 'qr') {
+        track('QR_SCAN_ENTRY');
       }
     })();
   </script>
