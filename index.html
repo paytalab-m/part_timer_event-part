@@ -1014,7 +1014,7 @@
       // ══════════════════════════════════════════════════
       //  Apps Script 트래킹 URL (배포 후 교체 필요)
       // ══════════════════════════════════════════════════
-      const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbyKfcr1Z8YotiTvyD7H7sk32XligPtwzkeISAlYA6Q52JhwmS8mJcZRfaE0ae2UtKC1pw/exec';
+      const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbzQj5anzBRomrIYLcIDoKL9gyf3zJONzCayRSMyBiRLwTs6Qz6bxsOA5V9Vy4dkbZWk5w/exec';
 
       // ─── URL 파라미터 파싱 ───
       const params = new URLSearchParams(window.location.search);
@@ -1055,7 +1055,10 @@
 
       // ─── 트래킹 함수 ───
       function track(eventName, extra) {
-        if (!TRACKING_URL) return;
+        if (!TRACKING_URL) {
+          console.log('[track] TRACKING_URL not set, skip', eventName);
+          return;
+        }
         const payload = {
           page: 'staff',
           sessionId: sessionId,
@@ -1072,19 +1075,30 @@
           timestamp: new Date().toISOString(),
           extra: extra || {}
         };
+        const data = JSON.stringify(payload);
+        console.log('[track]', eventName, payload);
+
         try {
-          const data = JSON.stringify(payload);
-          if (navigator.sendBeacon) {
-            const blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
-            if (navigator.sendBeacon(TRACKING_URL, blob)) return;
-          }
           fetch(TRACKING_URL, {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: data,
             keepalive: true
+          }).then(() => {
+            console.log('[track] fetch sent:', eventName);
+          }).catch(err => {
+            console.warn('[track] fetch error:', err);
           });
+        } catch (e) {
+          console.warn('[track] fetch threw:', e);
+        }
+
+        try {
+          if (navigator.sendBeacon) {
+            const blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
+            navigator.sendBeacon(TRACKING_URL, blob);
+          }
         } catch (e) { /* silent */ }
       }
 
