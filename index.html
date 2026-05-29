@@ -1174,7 +1174,7 @@
       // ══════════════════════════════════════════════════
       //  Apps Script 트래킹 URL (배포 후 교체 필요)
       // ══════════════════════════════════════════════════
-      const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbzQj5anzBRomrIYLcIDoKL9gyf3zJONzCayRSMyBiRLwTs6Qz6bxsOA5V9Vy4dkbZWk5w/exec';
+      const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbzAuzM0-zl9ul5o7zt3cs8hzul6mJh912lXsTv32e2Op0nEENapm6vgxHqB8MOtqQCEpQ/exec';
 
       // ─── URL 파라미터 파싱 ───
       const params = new URLSearchParams(window.location.search);
@@ -1240,29 +1240,28 @@
           extra: extra || {}
         };
         const data = JSON.stringify(payload);
-        console.log('[track]', eventName, payload);
 
-        try {
-          fetch(TRACKING_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: data,
-            keepalive: true
-          }).then(() => {
-            console.log('[track] fetch sent:', eventName);
-          }).catch(err => {
-            console.warn('[track] fetch error:', err);
-          });
-        } catch (e) {
-          console.warn('[track] fetch threw:', e);
-        }
-
+        // sendBeacon 우선 시도 (페이지 이탈해도 보장됨, 가장 안정적)
+        // 성공하면 fetch는 호출 안 함 → 중복 방지
+        let sent = false;
         try {
           if (navigator.sendBeacon) {
             const blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
-            navigator.sendBeacon(TRACKING_URL, blob);
+            sent = navigator.sendBeacon(TRACKING_URL, blob);
           }
         } catch (e) { /* silent */ }
+
+        // sendBeacon 실패 또는 미지원 시에만 fetch로 fallback
+        if (!sent) {
+          try {
+            fetch(TRACKING_URL, {
+              method: 'POST',
+              mode: 'no-cors',
+              body: data,
+              keepalive: true
+            }).catch(() => { /* silent */ });
+          } catch (e) { /* silent */ }
+        }
       }
 
       // ─── 이벤트: 페이지 진입 ───
