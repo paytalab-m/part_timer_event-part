@@ -336,6 +336,102 @@
       font-weight: 800;
     }
 
+    /* ============ 부재 안내 카드 - 액션 버튼 ============ */
+    .notice-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .notice-btn {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.1s, box-shadow 0.15s;
+    }
+    .notice-btn:active {
+      transform: scale(0.98);
+    }
+    .notice-btn.primary {
+      background: var(--accent);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(255, 107, 0, 0.25);
+    }
+    .notice-btn.primary:hover {
+      background: #FF7B1A;
+    }
+    .notice-btn.secondary {
+      background: #F5F5F5;
+      color: var(--text-900);
+      border: 1px solid #E5E5E5;
+    }
+    .notice-btn.secondary:hover {
+      background: #EFEFEF;
+    }
+
+    /* ============ 토스트 (잠깐 떴다 사라지는 안내) ============ */
+    .toast-container {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+      width: calc(100% - 32px);
+      max-width: 360px;
+    }
+    .toast {
+      background: #2A2A2A;
+      color: #FFFFFF;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      letter-spacing: -0.01em;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: auto;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .toast .toast-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: #FFD84D;
+    }
+    .toast .toast-title::before {
+      content: '✓';
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+
     /* ============ 보상 카드 (시급 안내) ============ */
     .reward-card h3 {
       margin: 0 0 6px;
@@ -768,6 +864,15 @@
             <li>모든 비용은 패스오더가 100% 부담하며, 매장에는 별도 부담이 없습니다</li>
             <li>대신 등록해도 리워드는 '<span data-nickname>{알바닉네임}</span>' 알바에게 자동 적립됩니다</li>
           </ul>
+
+          <div class="notice-actions">
+            <button type="button" class="notice-btn primary" id="btn-substitute">
+              '<span data-nickname>{알바닉네임}</span>' 알바 대신 응대할게요
+            </button>
+            <button type="button" class="notice-btn secondary" id="btn-apply">
+              제가 신청해서 할게요
+            </button>
+          </div>
         </div>
       </details>
 
@@ -1167,7 +1272,57 @@
       if (from === 'qr') {
         track('QR_SCAN_ENTRY');
       }
+
+      // ─── 토스트 표시 ───
+      function showToast(title, message, duration) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = '<div class="toast-title">' + title + '</div>' +
+                          '<div>' + message + '</div>';
+        container.appendChild(toast);
+        // 다음 프레임에 show 클래스 추가 (애니메이션 트리거)
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => toast.classList.add('show'));
+        });
+        // duration 후 제거
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, duration || 4000);
+      }
+
+      // ─── 버튼 1: 대신 응대할게요 ───
+      const btnSubstitute = document.getElementById('btn-substitute');
+      if (btnSubstitute) {
+        btnSubstitute.addEventListener('click', function() {
+          track('SUBSTITUTE_CLICK');
+          showToast(
+            '확인되었어요',
+            "'" + nickname + "' 알바님 대신 " + storeName + " 다른 근무자분이 응대하는 것으로 '" + nickname + "' 알바님께 알림을 보내드릴게요.",
+            5000
+          );
+        });
+      }
+
+      // ─── 버튼 2: 제가 신청해서 할게요 ───
+      const APPLY_URL = 'https://passorder.kr/Oa8B0jHM';
+      const REDIRECT_PAGE = 'redirect.html';
+      const btnApply = document.getElementById('btn-apply');
+
+      if (btnApply) {
+        btnApply.addEventListener('click', function() {
+          track('APPLY_CLICK');
+          // 같은 디렉토리의 redirect.html로 이동 (?next=passorder.kr/...)
+          const target = REDIRECT_PAGE + '?next=' + encodeURIComponent(APPLY_URL);
+          window.location.href = target;
+        });
+      }
     })();
   </script>
+
+  <!-- 토스트 컨테이너 -->
+  <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
 </body>
 </html>
