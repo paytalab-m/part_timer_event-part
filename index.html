@@ -1313,8 +1313,10 @@
       if (btnApply) {
         btnApply.addEventListener('click', function() {
           track('APPLY_CLICK');
-          // 같은 디렉토리의 redirect.html로 이동 (?next=passorder.kr/...)
-          const target = REDIRECT_PAGE + '?next=' + encodeURIComponent(APPLY_URL);
+          // 같은 디렉토리의 redirect.html로 이동 (?next=passorder.kr/... & store_name=...)
+          const target = REDIRECT_PAGE
+            + '?next=' + encodeURIComponent(APPLY_URL)
+            + '&store_name=' + encodeURIComponent(storeName);
           window.location.href = target;
         });
       }
