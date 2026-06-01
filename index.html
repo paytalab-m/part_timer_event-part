@@ -257,51 +257,63 @@
       color: var(--text-700);
       line-height: 1.65;
     }
-    .notice-body .notice-lead {
-      margin: 0 0 14px;
-      padding: 12px 14px;
-      background: #FFF6E0;
-      border-radius: 10px;
+    /* 헤드 영역 (시안의 안내 카피) */
+    .notice-body .notice-head {
+      margin-bottom: 18px;
+    }
+    .notice-body .notice-head-title {
+      margin: 0 0 6px;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-900);
+      letter-spacing: -0.025em;
+      line-height: 1.4;
+    }
+    .notice-body .notice-head-sub {
+      margin: 0;
       font-size: 13px;
+      color: var(--text-500);
       line-height: 1.6;
     }
-    .notice-body .notice-lead strong {
-      color: var(--text-900);
-      font-weight: 700;
-    }
+    /* 케이스 박스 */
     .notice-body .case-block {
-      margin-bottom: 10px;
-      padding: 12px 14px;
+      margin-bottom: 14px;
+      padding: 18px 18px 16px;
       border: 1px solid #E5E5E5;
-      border-radius: 10px;
+      border-radius: 14px;
+      background: #FFFFFF;
+    }
+    .notice-body .case-block:last-of-type {
+      margin-bottom: 14px;
     }
     .notice-body .case-tag {
       display: inline-block;
-      font-size: 10.5px;
+      font-size: 11.5px;
       font-weight: 800;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.06em;
       color: var(--text-500);
       background: #F2F2F2;
-      padding: 3px 8px;
-      border-radius: 5px;
-      margin-bottom: 8px;
+      padding: 5px 11px;
+      border-radius: 7px;
+      margin-bottom: 14px;
     }
     .notice-body .case-tag.accent {
       color: var(--accent);
       background: var(--accent-faded);
     }
     .notice-body .case-title {
-      margin: 0 0 4px;
-      font-size: 13.5px;
-      font-weight: 700;
+      margin: 0 0 10px;
+      font-size: 15px;
+      font-weight: 800;
       color: var(--text-900);
-      line-height: 1.5;
+      line-height: 1.45;
+      letter-spacing: -0.02em;
     }
     .notice-body .case-desc {
-      margin: 0;
-      font-size: 12.5px;
+      margin: 0 0 16px;
+      font-size: 13px;
       color: var(--text-700);
-      line-height: 1.55;
+      line-height: 1.65;
     }
     .notice-body strong {
       color: var(--text-900);
@@ -311,6 +323,39 @@
       color: var(--accent);
       font-weight: 700;
     }
+    /* 케이스 박스 안 액션 버튼 */
+    .case-btn {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.1s, background 0.15s;
+    }
+    .case-btn:active {
+      transform: scale(0.98);
+    }
+    .case-btn.primary {
+      background: var(--accent);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(255, 107, 0, 0.20);
+    }
+    .case-btn.primary:hover {
+      background: #FF7B1A;
+    }
+    .case-btn.secondary {
+      background: #F5F5F5;
+      color: var(--text-900);
+      border: 1px solid #E5E5E5;
+    }
+    .case-btn.secondary:hover {
+      background: #EFEFEF;
+    }
+    /* 체크리스트 */
     .notice-body .check-list {
       margin: 14px 0 0;
       padding: 12px 14px;
@@ -336,43 +381,9 @@
       font-weight: 800;
     }
 
-    /* ============ 부재 안내 카드 - 액션 버튼 ============ */
+    /* ============ (구) 부재 안내 카드 - 액션 버튼 (현재 미사용, 호환 유지) ============ */
     .notice-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 16px;
-    }
-    .notice-btn {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 12px;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      cursor: pointer;
-      border: none;
-      transition: transform 0.1s, box-shadow 0.15s;
-    }
-    .notice-btn:active {
-      transform: scale(0.98);
-    }
-    .notice-btn.primary {
-      background: var(--accent);
-      color: #FFFFFF;
-      box-shadow: 0 4px 12px rgba(255, 107, 0, 0.25);
-    }
-    .notice-btn.primary:hover {
-      background: #FF7B1A;
-    }
-    .notice-btn.secondary {
-      background: #F5F5F5;
-      color: var(--text-900);
-      border: 1px solid #E5E5E5;
-    }
-    .notice-btn.secondary:hover {
-      background: #EFEFEF;
+      display: none;
     }
 
     /* ============ 토스트 (잠깐 떴다 사라지는 안내) ============ */
@@ -846,33 +857,45 @@
           </div>
         </summary>
         <div class="notice-body">
-          <div class="case-block">
-            <div class="case-tag">CASE 1</div>
-            <p class="case-title">대신 응대하는 분이 <strong>[시급 2배 챌린지]</strong>에 이미 참여 중이라면</p>
-            <p class="case-desc">→ 패스오더 점주용 프로그램에서 본인 칸의 영수증 쿠폰을 출력해서 손님에게 전달</p>
+          <div class="notice-head">
+            <p class="notice-head-title">
+              '<span data-nickname>{알바닉네임}</span>'님의 동료분이 해주실 일은요!
+            </p>
+            <p class="notice-head-sub">
+              손님이 매장에서 첫 주문하면 적립금은 '<span data-nickname>{알바닉네임}</span>' 알바님에게 적립돼요.<br>
+              어떻게 도와주실지 선택해주세요.
+            </p>
           </div>
 
           <div class="case-block">
-            <div class="case-tag accent">CASE 2</div>
-            <p class="case-title">대신 응대하는 분이 <strong>[시급 2배 챌린지]</strong>에 미참여 중이고, '<span data-nickname>{알바닉네임}</span>' 알바를 대신해서 응대 중이라면</p>
-            <p class="case-desc" id="case2-desc-unregistered" style="display:none;">→ 아래 <strong>[처음이라면 4단계로 끝]</strong> 절차대로 등록 + 출력 → 손님에게 전달</p>
-            <p class="case-desc" id="case2-desc-registered" style="display:none;">→ 아래 <strong>[30초로 끝나요]</strong> 절차대로 출력 → 손님에게 전달</p>
+            <div class="case-tag">CASE A</div>
+            <p class="case-title">'<span data-nickname>{알바닉네임}</span>' 알바님 대신 응대만 도와드릴게요</p>
+            <p class="case-desc">
+              '<span data-nickname>{알바닉네임}</span>' 알바님이 부재 시간이지만 손님 응대만 대신해드리는 경우예요.<br>
+              → 적립금은 '<span data-nickname>{알바닉네임}</span>' 알바님에게 적립<br>
+              → 동료분께는 적립금이 따로 가지 않아요
+            </p>
+            <button type="button" class="case-btn primary" id="btn-substitute">
+              '<span data-nickname>{알바닉네임}</span>' 알바 대신 응대할게요
+            </button>
+          </div>
+
+          <div class="case-block">
+            <div class="case-tag accent">CASE B</div>
+            <p class="case-title">저도 신청해서 직접 참여하고 싶어요</p>
+            <p class="case-desc">
+              동료분도 <strong>[시급 2배 챌린지]</strong>에 참여하시면 본인 코드로 손님을 응대해 본인 적립금을 받을 수 있어요.<br>
+              → 적립금이 동료분에게 적립
+            </p>
+            <button type="button" class="case-btn secondary" id="btn-apply">
+              제가 신청해서 할게요
+            </button>
           </div>
 
           <ul class="check-list">
             <li>매장 홍보를 위해 패스오더에서 손님께 발송된 안내를 보고 찾아오신 손님입니다</li>
             <li>모든 비용은 패스오더가 100% 부담하며, 매장에는 별도 부담이 없습니다</li>
-            <li>대신 등록해도 리워드는 '<span data-nickname>{알바닉네임}</span>' 알바에게 자동 적립됩니다</li>
           </ul>
-
-          <div class="notice-actions">
-            <button type="button" class="notice-btn primary" id="btn-substitute">
-              '<span data-nickname>{알바닉네임}</span>' 알바 대신 응대할게요
-            </button>
-            <button type="button" class="notice-btn secondary" id="btn-apply">
-              제가 신청해서 할게요
-            </button>
-          </div>
         </div>
       </details>
 
@@ -1209,12 +1232,8 @@
       if (isUnregistered) {
         document.getElementById('full-flow').style.display = '';
         document.getElementById('faq-code-error').style.display = '';
-        const c2u = document.getElementById('case2-desc-unregistered');
-        if (c2u) c2u.style.display = '';
       } else {
         document.getElementById('quick-flow').style.display = '';
-        const c2r = document.getElementById('case2-desc-registered');
-        if (c2r) c2r.style.display = '';
       }
 
       // ─── 트래킹 함수 ───
