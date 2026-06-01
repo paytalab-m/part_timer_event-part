@@ -1197,7 +1197,7 @@
       // ══════════════════════════════════════════════════
       //  Apps Script 트래킹 URL (배포 후 교체 필요)
       // ══════════════════════════════════════════════════
-      const TRACKING_URL = 'https://script.google.com/macros/s/AKfycby_fA79-fH1NEu1XgKO7kUi33w_Smn31gLeX6hmCcDoFk2Ab8b43vZnF6oeNNCi1z8x6Q/exec';
+      const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbxAsknFmNhvYg-mQq2oBjiIiR_Ev3ivFLmwLD_4XqnM6j_pkCNDqP_vzmLOBdn8qR7zRA/exec';
 
       // ─── URL 파라미터 파싱 ───
       const params = new URLSearchParams(window.location.search);
@@ -1206,6 +1206,11 @@
       const code         = params.get('code')          || '0000-0000';
       const customerName = params.get('customer_name') || '';
       const from         = params.get('from')          || 'direct'; // qr / direct / crm
+      // 캠페인 레퍼럴 (트래킹만)
+      const msgCode         = params.get('msg_code')         || '';
+      const customerSegment = params.get('customer_segment') || '';
+      const tier            = params.get('tier')             || '';
+      const batch           = params.get('batch')            || '';
 
       const segment = (params.get('segment') || params.get('status') || 'unregistered').toLowerCase();
       const isUnregistered = (segment === 'unregistered' || segment === '미등록' || segment === 'new');
@@ -1253,6 +1258,10 @@
           segment: segment,
           customerName: customerName,
           from: from,
+          msgCode: msgCode,
+          customerSegment: customerSegment,
+          tier: tier,
+          batch: batch,
           referrer: document.referrer || '',
           userAgent: navigator.userAgent || '',
           timestamp: new Date().toISOString(),
